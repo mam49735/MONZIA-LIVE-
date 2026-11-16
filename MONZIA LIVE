@@ -1,1 +1,61 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ttcm Live Clone</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background: #0f0f1a; color: #fff; height: 100vh; display: flex; justify-content: center; align-items: center; }
+    .card { background: #1c1c2e; padding: 24px; border-radius: 16px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+    h2 { margin-bottom: 16px; color: #ff4d79; }
+    input { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #333; background: #121220; color: #fff; font-size: 15px; }
+    button { width: 100%; padding: 13px; margin-top: 8px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; color: #fff; }
+    .btn-host { background: linear-gradient(90deg, #ff4d79, #ff7b54); }
+    .btn-audience { background: #3b82f6; }
+    #root { width: 100vw; height: 100vh; display: none; }
+  </style>
+</head>
+<body>
 
+  <div class="card" id="login-box">
+    <h2>MONZIA Live</h2>
+    <input type="text" id="username" placeholder="আপনার নাম লিখুন (যেমন: Rahim)" />
+    <input type="text" id="roomid" placeholder="রুম আইডি (যেমন: room101)" value="room101" />
+    <button class="btn-host" onclick="startLive('Host')"> Go Live (হোস্ট)</button>
+    <button class="btn-audience" onclick="startLive('Audience')">👀 Watch Live (দর্শক)</button>
+  </div>
+
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
+  <script>
+    function startLive(userRole) {
+      const appID = 20050748;
+      const serverSecret = "YOUR_SERVER_SECRET"; "eb0267112b64aac226ccc728e921af683365caa8522ed826b76adb472220c965";
+
+      const userName = document.getElementById("username").value.trim() || "User_" + Math.floor(Math.random() * 1000);
+      const roomID = document.getElementById("roomid").value.trim().replace(/[^a-zA-Z0-9_]/g, "") || "room101";
+      const userID = "id_" + Math.floor(Math.random() * 100000);
+
+      document.getElementById("login-box").style.display = "none";
+      document.getElementById("root").style.display = "block";
+
+      const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
+        appID, serverSecret, roomID, userID, userName
+      );
+
+      const role = userRole === "Host" ? ZegoUIKitPrebuilt.Host : ZegoUIKitPrebuilt.Audience;
+
+      const zp = ZegoUIKitPrebuilt.create(kitToken);
+      zp.joinRoom({
+        container: document.querySelector("#root"),
+        scenario: {
+          mode: ZegoUIKitPrebuilt.LiveStreaming,
+          config: { role }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
